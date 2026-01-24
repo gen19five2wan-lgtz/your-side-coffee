@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YOUR SIDE COFFEE | 三鷹駅徒歩2分 自家焙煎スペシャルティコーヒー（旧:珈琲や三鷹工房）</title>
+    <meta name="description" content="60種類以上の生豆から選ぶ、オンデマンド焙煎のスペシャルティコーヒー。三鷹駅南口徒歩2分。Wi-Fi完備、ペット可テラス席あり。">
+    <meta name="keywords"
+        content="三鷹 コーヒー焙煎, 三鷹 スペシャルティコーヒー, YOUR SIDE COFFEE, 自家焙煎 東京, コーヒーフライト, 生豆販売, 電源カフェ 三鷹, ペット可 カフェ 三鷹, 珈琲や 三鷹工房">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <h1>YOUR SIDE COFFEE</h1>
+                <span class="nav-subtitle">三鷹駅徒歩2分 自家焙煎コーヒー</span>
+            </div>
+            <button class="hamburger" id="hamburger" aria-label="メニュー">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="#beans">Beans</a></li>
+                <li><a href="#menu">Menu</a></li>
+                <li><a href="#experience">Experience</a></li>
+                <li><a href="#access">Access</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- News Banner -->
+    <div class="news-banner">
+        <div class="container">
+            <p>🎉 2025.04.01 リニューアルオープン — 珈琲や 三鷹工房より新しく生まれ変わりました</p>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-image">
+            <img src="images/hero_roasting_1769223062075.png" alt="コーヒー焙煎の様子">
+        </div>
+        <div class="hero-content">
+            <h2 class="hero-tagline">あなたのそばに、最高の一杯を</h2>
+            <p class="hero-subtitle">60種類以上の生豆から選ぶ、オンデマンド焙煎のスペシャルティコーヒー</p>
+            <a href="#beans" class="cta-button">豆を探す</a>
+        </div>
+    </section>
+
+    <!-- Concept Section -->
+    <section class="concept section" id="concept">
+        <div class="container">
+            <h2 class="section-title">YOUR SIDE の意味</h2>
+            <p class="section-intro">「あなたのそばに」という店名には、3つの想いが込められています</p>
+
+            <div class="concept-grid">
+                <div class="concept-card">
+                    <div class="concept-icon">📍</div>
+                    <h3>物理的な近さ</h3>
+                    <p>三鷹駅南口から徒歩2分。通勤、通学、お散歩の途中に。いつでも気軽に立ち寄れる、生活のそばにあるコーヒーショップです。</p>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">❤️</div>
+                    <h3>精神的な寄り添い</h3>
+                    <p>嬉しい時も、悲しい時も。忙しい朝も、ゆったりした午後も。いつもあなたの心に寄り添うパートナーでありたい。</p>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">☕</div>
+                    <h3>選択の尊重</h3>
+                    <p>トレンドや流行ではなく、あなたの好みを最優先。60種類以上の豆から、あなたの「美味しい」を一緒に見つけます。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Beans Showcase Section -->
+    <section class="beans section" id="beans">
+        <div class="container">
+            <h2 class="section-title">60種類以上の生豆から選ぶ</h2>
+            <p class="section-intro">世界中の産地から厳選したスペシャルティコーヒー。生豆の状態でお選びいただき、その場で焙煎いたします。</p>
+
+            <!-- Filter Buttons -->
+            <div class="bean-filters">
+                <button class="filter-btn active" data-filter="all">すべて</button>
+                <button class="filter-btn" data-filter="africa">アフリカ</button>
+                <button class="filter-btn" data-filter="america">中南米</button>
+                <button class="filter-btn" data-filter="asia">アジア</button>
+            </div>
+
+            <!-- Beans Grid -->
+            <div class="beans-grid">
+                <!-- Africa -->
+                <div class="bean-card" data-region="africa">
+                    <div class="bean-image">
+                        <img src="images/beans_transformation_1769223236951.png" alt="エチオピア イルガチェフェ">
+                    </div>
+                    <h3>エチオピア イルガチェフェ</h3>
+                    <p class="bean-origin">アフリカ / エチオピア</p>
+                    <p class="bean-flavor">🍋 フルーティー・フローラル</p>
+                    <div class="bean-roast">
+                        <span class="roast-badge light">浅煎り</span>
+                        <span class="roast-badge medium">中煎り</span>
+                    </div>
+                </div>
+
+                <div class="bean-card" data-region="africa">
+                    <div class="bean-image">
+                        <img src="images/beans_showcase_1769223096313.png" alt="ケニア AA">
+                    </div>
+                    <h3>ケニア AA</h3>
+                    <p class="bean-origin">アフリカ / ケニア</p>
+                    <p class="bean-flavor">🍇 ベリー・ワイン</p>
+                    <div class="bean-roast">
+                        <span class="roast-badge light">浅煎り</span>
+                    </div>
+                </div>
+
+                <div class="bean-card" data-region="africa">
+                    <div class="bean-image">
+                        <img src="images/beans_showcase_1769223096313.png" alt="ルワンダ">
+                    </div>
+                    <h3>ルワンダ</h3>
+                    <p class="bean-origin">アフリカ / ルワンダ</p>
+                    <p class="bean-flavor">🍊 シトラス・ハニー</p>
+                    <div class="bean-roast">
+                        <span class="roast-badge light">浅煎り</span>
+                        <span class="roast-badge medium">中煎り</span>
+                    </div>
+                </div>
+
+                <!-- Central/South America -->
+                <div class="bean-card" data-region="america">
+                    <div class="bean-image">
+                        <img src="images/beans_showcase_1769223096313.png" alt="コロンビア スプレモ">
+                    </div>
+                    <h3>コロンビア スプレモ</h3>
+                    <p class="bean-origin">中南米 / コロンビア</p>
+                    <p class="bean-flavor">🥜 ナッツ・チョコレート</p>
+                    <div class="bean-roast">
+                        <span class="roast-badge medium">中煎り</span>
+                        <span class="roast-badge dark">深煎り</span>
+                    </div>
+                </div>
+
+                <div class="bean-card" data-region="america">
+                    <div class="bean-image">
+                        <img src="images/beans_showcase_1769223096313.png" alt="グアテマラ アンティグア">
+                    </div>
+                    <h3>グアテマラ アンティグア</h3>
+                    <p class="bean-origin">中南米 / グアテマラ</p>
+                    <p class="bean-flavor">🍫 カカオ・スパイス</p>
+                    <div class="bean-roast">
+                        <span class="roast-badge medium">中煎り</span>
+                        <span class="roast-badge dark">深煎り</span>
+                    </div>
+                </div>
+
+                <div class="bean-card" data-region="america">
+                    <div class="bean-image">
+                        <img src="images/beans_showcase_1769223096313.png" alt="ブラジル サントス">
+                    </div>
+                    <h3>ブラジル サントス</h3>
+                    <p class="bean-origin">中南米 / ブラジル</p>
+                    <p class="bean-flavor">🌰 ナッツ・バランス</p>
+                    <div class="bean-roast">
+                        <span class="roast-badge medium">中煎り</span>
+                        <span class="roast-badge dark">深煎り</span>
+                    </div>
+                </div>
+
+                <!-- Asia -->
+                <div class="bean-card" data-region="asia">
+                    <div class="bean-image">
+                        <img src="images/beans_showcase_1769223096313.png" alt="インドネシア マンデリン">
+                    </div>
+                    <h3>インドネシア マンデリン</h3>
+                    <p class="bean-origin">アジア / インドネシア</p>
+                    <p class="bean-flavor">🌿 ハーブ・アーシー</p>
+                    <div class="bean-roast">
+                        <span class="roast-badge dark">深煎り</span>
+                    </div>
+                </div>
+
+                <div class="bean-card" data-region="asia">
+                    <div class="bean-image">
+                        <img src="images/beans_showcase_1769223096313.png" alt="パプアニューギニア">
+                    </div>
+                    <h3>パプアニューギニア</h3>
+                    <p class="bean-origin">アジア太平洋 / PNG</p>
+                    <p class="bean-flavor">🍯 ハニー・フルーティー</p>
+                    <div class="bean-roast">
+                        <span class="roast-badge medium">中煎り</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Special Offer -->
+            <div class="special-offer">
+                <div class="offer-content">
+                    <h3>🎁 スペシャルオファー</h3>
+                    <p>コーヒー豆200gのご購入で、ハンドドリップコーヒー1杯サービス</p>
+                    <span class="offer-note">※店内でのご利用時のみ</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Menu Section -->
+    <section class="menu section" id="menu">
+        <div class="container">
+            <h2 class="section-title">Cafe Menu</h2>
+            <p class="section-intro">こだわりのコーヒーと、相性抜群のフード</p>
+
+            <div class="menu-category">
+                <h3 class="category-title">Drinks</h3>
+                <div class="menu-grid">
+                    <div class="menu-item">
+                        <div class="menu-image">
+                            <img src="images/hero_handrip_1769223078254.png" alt="ハンドドリップコーヒー">
+                        </div>
+                        <div class="menu-details">
+                            <h4>ハンドドリップコーヒー</h4>
+                            <p>60種類以上の豆から選べる、丁寧に淹れた一杯</p>
+                            <span class="price">¥600〜</span>
+                        </div>
+                    </div>
+
+                    <div class="menu-item featured">
+                        <div class="menu-image">
+                            <img src="images/menu_coffeeflight_1769223115017.png" alt="コーヒーフライト">
+                        </div>
+                        <div class="menu-details">
+                            <h4>コーヒーフライト</h4>
+                            <p>浅煎り・中煎り・深煎りの飲み比べセット</p>
+                            <span class="price">¥1,200</span>
+                            <span class="badge">人気</span>
+                        </div>
+                    </div>
+
+                    <div class="menu-item">
+                        <div class="menu-image">
+                            <img src="images/hero_handrip_1769223078254.png" alt="エスプレッソドリンク">
+                        </div>
+                        <div class="menu-details">
+                            <h4>エスプレッソドリンク</h4>
+                            <p>カプチーノ、ラテ、アメリカーノ</p>
+                            <span class="price">¥500〜</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-category">
+                <h3 class="category-title">Food</h3>
+                <div class="menu-grid">
+                    <div class="menu-item featured">
+                        <div class="menu-image">
+                            <img src="images/menu_eggsandwich_1769223133027.png" alt="たまごサンド">
+                        </div>
+                        <div class="menu-details">
+                            <h4>たまごサンド</h4>
+                            <p>ふわふわ卵のクリーミーなサンドイッチ</p>
+                            <span class="price">¥800</span>
+                            <span class="badge">シグネチャー</span>
+                        </div>
+                    </div>
+
+                    <div class="menu-item">
+                        <div class="menu-image">
+                            <img src="images/menu_tacorice_1769223153198.png" alt="タコライス">
+                        </div>
+                        <div class="menu-details">
+                            <h4>タコライス</h4>
+                            <p>ランチにぴったりのボリューム満点メニュー</p>
+                            <span class="price">¥1,000</span>
+                        </div>
+                    </div>
+
+                    <div class="menu-item">
+                        <div class="menu-image">
+                            <img src="images/menu_hotcakes_1769223167359.png" alt="ホットケーキ">
+                        </div>
+                        <div class="menu-details">
+                            <h4>ホットケーキ</h4>
+                            <p>懐かしくて優しい、ふわふわパンケーキ</p>
+                            <span class="price">¥900</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <p class="menu-note">※価格は税込です。季節のタルト＆ケーキもご用意しております。</p>
+        </div>
+    </section>
+
+    <!-- Experience Section -->
+    <section class="experience section" id="experience">
+        <div class="container">
+            <h2 class="section-title">オンデマンド焙煎という体験</h2>
+            <p class="section-intro">ご注文を受けてから焙煎する、究極の鮮度へのこだわり</p>
+
+            <div class="experience-content">
+                <div class="experience-image">
+                    <img src="images/hero_roasting_1769223062075.png" alt="焙煎の様子">
+                </div>
+                <div class="experience-text">
+                    <div class="process-steps">
+                        <div class="step">
+                            <span class="step-number">01</span>
+                            <h4>生豆を見て選ぶ</h4>
+                            <p>ガラス瓶に入った生豆を見ながら、お好みの産地や味わいをお選びください。</p>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">02</span>
+                            <h4>焙煎度を相談</h4>
+                            <p>浅煎り、中煎り、深煎り。豆の個性を引き出す最適な焙煎度をご提案します。</p>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">03</span>
+                            <h4>その場で焙煎</h4>
+                            <p>目の前で焙煎機が動き出し、生豆が美しく変化していく様子をご覧ください。</p>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">04</span>
+                            <h4>鮮度最高の一杯を</h4>
+                            <p>焼きたての豆から立ち上る、最高の香り。酸化していない豊かな味わいをお楽しみください。</p>
+                        </div>
+                    </div>
+
+                    <div class="why-roast">
+                        <h4>なぜオンデマンド焙煎なのか？</h4>
+                        <ul>
+                            <li>焙煎直後が最も香りが強く、酸化していない状態</li>
+                            <li>お客様のお好みに合わせた焙煎度を選べる</li>
+                            <li>「自分のために作られた」特別な体験</li>
+                            <li>コーヒーが「植物の種子」であることを再認識</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section class="gallery section">
+        <div class="container">
+            <h2 class="section-title">店内の雰囲気</h2>
+            <p class="section-intro">温かみのある木の空間で、ゆったりとした時間を</p>
+
+            <div class="gallery-grid">
+                <div class="gallery-item">
+                    <img src="images/interior_counter_1769223185245.png" alt="カウンター席">
+                </div>
+                <div class="gallery-item">
+                    <img src="images/interior_tables_1769223201190.png" alt="テーブル席">
+                </div>
+                <div class="gallery-item">
+                    <img src="images/interior_terrace_1769223220197.png" alt="テラス席">
+                </div>
+                <div class="gallery-item">
+                    <img src="images/beans_showcase_1769223096313.png" alt="豆の陳列">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Facilities Section -->
+    <section class="facilities section">
+        <div class="container">
+            <h2 class="section-title">ご利用案内</h2>
+
+            <div class="facilities-grid">
+                <div class="facility-item">
+                    <div class="facility-icon">📶</div>
+                    <h4>Wi-Fi完備</h4>
+                    <p>リモートワークや勉強に最適</p>
+                </div>
+                <div class="facility-item">
+                    <div class="facility-icon">🔌</div>
+                    <h4>電源あり</h4>
+                    <p>長時間の作業も安心</p>
+                </div>
+                <div class="facility-item">
+                    <div class="facility-icon">♿</div>
+                    <h4>車椅子対応</h4>
+                    <p>1階・段差なし・多目的トイレあり</p>
+                </div>
+                <div class="facility-item">
+                    <div class="facility-icon">🐕</div>
+                    <h4>ペット可</h4>
+                    <p>テラス席のみ同伴可能</p>
+                </div>
+                <div class="facility-item">
+                    <div class="facility-icon">🚭</div>
+                    <h4>全席禁煙</h4>
+                    <p>清潔で快適な空間</p>
+                </div>
+                <div class="facility-item">
+                    <div class="facility-icon">🛍️</div>
+                    <h4>テイクアウト可</h4>
+                    <p>豆販売・ドリンク持ち帰りOK</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Payment Methods -->
+    <section class="payment section">
+        <div class="container">
+            <h3 class="section-title">ご利用可能なお支払い方法</h3>
+
+            <div class="payment-category">
+                <h4>クレジットカード</h4>
+                <div class="payment-logos">
+                    <span class="payment-badge">VISA</span>
+                    <span class="payment-badge">Mastercard</span>
+                    <span class="payment-badge">JCB</span>
+                    <span class="payment-badge">AMEX</span>
+                    <span class="payment-badge">Diners</span>
+                </div>
+            </div>
+
+            <div class="payment-category">
+                <h4>電子マネー</h4>
+                <div class="payment-logos">
+                    <span class="payment-badge">交通系IC</span>
+                    <span class="payment-badge">iD</span>
+                    <span class="payment-badge">楽天Edy</span>
+                    <span class="payment-badge">WAON</span>
+                    <span class="payment-badge">nanaco</span>
+                </div>
+            </div>
+
+            <div class="payment-category">
+                <h4>QR/バーコード決済</h4>
+                <div class="payment-logos">
+                    <span class="payment-badge">PayPay</span>
+                    <span class="payment-badge">d払い</span>
+                    <span class="payment-badge">楽天ペイ</span>
+                    <span class="payment-badge">au PAY</span>
+                </div>
+            </div>
+
+            <div class="payment-category">
+                <h4>モバイル決済</h4>
+                <div class="payment-logos">
+                    <span class="payment-badge">Apple Pay</span>
+                    <span class="payment-badge">Google Pay</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Access Section -->
+    <section class="access section" id="access">
+        <div class="container">
+            <h2 class="section-title">アクセス・店舗情報</h2>
+
+            <div class="access-content">
+                <div class="access-info">
+                    <div class="info-block">
+                        <h4>住所</h4>
+                        <p>東京都三鷹市下連雀3-43-28 創英ビル 1F</p>
+                    </div>
+
+                    <div class="info-block">
+                        <h4>アクセス</h4>
+                        <p><strong>JR中央線・総武線「三鷹駅」南口より徒歩2分</strong></p>
+                        <p class="access-note">商業施設「Tricona」近く、三鷹通り沿い</p>
+                    </div>
+
+                    <div class="info-block">
+                        <h4>営業時間</h4>
+                        <p>10:00 - 19:00</p>
+                    </div>
+
+                    <div class="info-block">
+                        <h4>定休日</h4>
+                        <p>不定休（SNSでお知らせします）</p>
+                    </div>
+
+                    <div class="info-block">
+                        <h4>座席数</h4>
+                        <p>全28席（カウンター4席 / テーブル18席 / テラス6席）</p>
+                    </div>
+
+                    <div class="info-block">
+                        <h4>駐車場</h4>
+                        <p>なし（近隣コインパーキングをご利用ください）</p>
+                    </div>
+
+                    <div class="info-block important">
+                        <h4>⚠️ ご注意</h4>
+                        <p><strong>予約不可</strong> — 来店順のご案内となります</p>
+                    </div>
+                </div>
+
+                <div class="access-map">
+                    <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3240.5385719726864!2d139.5594!3d35.7027!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzXCsDQyJzA5LjciTiAxMznCsDMzJzMzLjgiRQ!5e0!3m2!1sja!2sjp!4v1234567890"
+                        width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq section" id="contact">
+        <div class="container">
+            <h2 class="section-title">よくあるご質問</h2>
+
+            <div class="faq-list">
+                <div class="faq-item">
+                    <h4>予約はできますか？</h4>
+                    <p>申し訳ございませんが、予約は承っておりません。来店順にご案内しております。</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4>Wi-Fiや電源はありますか？</h4>
+                    <p>はい、Wi-Fiは無料でご利用いただけます。電源もご用意しておりますので、スタッフまでお声がけください。</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4>ペット同伴は可能ですか？</h4>
+                    <p>テラス席のみ、ペット同伴でご利用いただけます。（店内はご遠慮いただいております）</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4>駐車場はありますか？</h4>
+                    <p">専用駐車場はございません。近隣のコインパーキング、または三鷹駅周辺の駐車場をご利用ください。</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4>コーヒー豆の購入だけでも大丈夫ですか？</h4>
+                    <p>もちろんです！豆のみのご購入も大歓迎です。200g以上お買い上げで、その場でハンドドリップコーヒー1杯サービスいたします。</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4>オンデマンド焙煎にはどれくらい時間がかかりますか？</h4>
+                    <p>焙煎度にもよりますが、おおよそ15〜20分程度です。待ち時間も含めてコーヒー体験としてお楽しみください。</p>
+                </div>
+            </div>
+
+            <div class="contact-info">
+                <h3>お問い合わせ</h3>
+                <p>その他ご質問がございましたら、お気軽にお問い合わせください。</p>
+                <p><strong>Email:</strong> info@yourside-coffee.jp（仮）</p>
+                <p><strong>SNS:</strong> Instagram / Twitter 準備中</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <h3>YOUR SIDE COFFEE</h3>
+                    <p class="footer-legacy">旧：珈琲や 三鷹工房</p>
+                    <p>あなたのそばに、最高の一杯を</p>
+                </div>
+
+                <div class="footer-info">
+                    <h4>店舗情報</h4>
+                    <p>東京都三鷹市下連雀3-43-28 創英ビル 1F</p>
+                    <p>JR三鷹駅南口 徒歩2分</p>
+                    <p>営業時間: 10:00 - 19:00</p>
+                </div>
+
+                <div class="footer-links">
+                    <h4>リンク</h4>
+                    <ul>
+                        <li><a href="#beans">Beans</a></li>
+                        <li><a href="#menu">Menu</a></li>
+                        <li><a href="#experience">Experience</a></li>
+                        <li><a href="#access">Access</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2025 YOUR SIDE COFFEE. All rights reserved.</p>
+                <p class="footer-keywords">三鷹 自家焙煎 | スペシャルティコーヒー | オンデマンド焙煎 | コーヒーフライト | 珈琲や三鷹工房</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="script.js"></script>
+</body>
+
+</html>
