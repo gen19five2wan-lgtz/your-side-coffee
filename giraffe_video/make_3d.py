@@ -2,7 +2,7 @@ s = open("render_real.py").read()
 def cut(s, a, b, new):
     i, j = s.index(a), s.index(b)
     return s[:i] + new + s[j:]
-s = s.replace("pv_r_", "pv_3_").replace("dosoku_kaiten_real.mp4", "dosoku_kaiten_3d.mp4").replace("audio_real.wav", "audio_3d.wav")
+s = s.replace("pv_r_", "pv_3_").replace("dosoku_kaiten_real.mp4", "dosoku_kaiten_3d_station.mp4").replace("audio_real.wav", "audio_3d_station.wav")
 
 helpers = '''# ---------- 3D(three.js)で描いた画に、HUD・文字を重ねる ----------
 CUR = {"key": None}
@@ -150,15 +150,15 @@ s = s[:i] + '''    if arg == "preview":
         if n in SCENES3D: items.append({"key": f"f{f:05d}", "scene": n, "t": float(t - starts[idx]), "T": float(t)})
     run_node(items, workers=4)
     audio, has_voice = build_audio()
-    with wave.open(os.path.join(HERE, "audio_3d.wav"), "wb") as wf:
+    with wave.open(os.path.join(HERE, "audio_3d_station.wav"), "wb") as wf:
         wf.setnchannels(1); wf.setsampwidth(2); wf.setframerate(SR)
         wf.writeframes((audio*32000).astype(np.int16).tobytes())
     af = ["-af", "loudnorm=I=-14:TP=-1.5:LRA=11"] if has_voice else []
     p = subprocess.Popen(["ffmpeg", "-y", "-v", "error", "-f", "rawvideo", "-pix_fmt", "rgb24",
-                          "-s", f"{W}x{H}", "-r", str(FPS), "-i", "-", "-i", os.path.join(HERE, "audio_3d.wav"),
+                          "-s", f"{W}x{H}", "-r", str(FPS), "-i", "-", "-i", os.path.join(HERE, "audio_3d_station.wav"),
                           "-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-pix_fmt", "yuv420p",
                           *af, "-c:a", "aac", "-b:a", "128k", "-shortest", "-movflags", "+faststart",
-                          os.path.join(HERE, "dosoku_kaiten_3d.mp4")], stdin=subprocess.PIPE)
+                          os.path.join(HERE, "dosoku_kaiten_3d_station.mp4")], stdin=subprocess.PIPE)
     idx = 0
     for f in range(nfr):
         t = f/FPS

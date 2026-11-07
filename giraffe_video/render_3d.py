@@ -2,7 +2,7 @@
 使い方:
   python3 render_giraffe.py preview     確認用の静止画 (pv_3_*.png)
   python3 render_giraffe.py check       文字色のコントラスト比を表示
-  python3 render_giraffe.py             本番書き出し -> dosoku_kaiten_3d.mp4
+  python3 render_giraffe.py             本番書き出し -> dosoku_kaiten_3d_station.mp4
 素材:
   giraffe.png            真上から見た透過PNG(頭が右向き・ほぼ一直線)。無ければ仮キリンを自動生成
   giraffe_meta.json      任意。{"tail_x":..,"nose_x":..,"axis_y":..,"rotate":deg} 尾の付け根/鼻先/体軸のpx座標
@@ -717,15 +717,15 @@ if __name__ == "__main__":
         if n in SCENES3D: items.append({"key": f"f{f:05d}", "scene": n, "t": float(t - starts[idx]), "T": float(t)})
     run_node(items, workers=4)
     audio, has_voice = build_audio()
-    with wave.open(os.path.join(HERE, "audio_3d.wav"), "wb") as wf:
+    with wave.open(os.path.join(HERE, "audio_3d_station.wav"), "wb") as wf:
         wf.setnchannels(1); wf.setsampwidth(2); wf.setframerate(SR)
         wf.writeframes((audio*32000).astype(np.int16).tobytes())
     af = ["-af", "loudnorm=I=-14:TP=-1.5:LRA=11"] if has_voice else []
     p = subprocess.Popen(["ffmpeg", "-y", "-v", "error", "-f", "rawvideo", "-pix_fmt", "rgb24",
-                          "-s", f"{W}x{H}", "-r", str(FPS), "-i", "-", "-i", os.path.join(HERE, "audio_3d.wav"),
+                          "-s", f"{W}x{H}", "-r", str(FPS), "-i", "-", "-i", os.path.join(HERE, "audio_3d_station.wav"),
                           "-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-pix_fmt", "yuv420p",
                           *af, "-c:a", "aac", "-b:a", "128k", "-shortest", "-movflags", "+faststart",
-                          os.path.join(HERE, "dosoku_kaiten_3d.mp4")], stdin=subprocess.PIPE)
+                          os.path.join(HERE, "dosoku_kaiten_3d_station.mp4")], stdin=subprocess.PIPE)
     idx = 0
     for f in range(nfr):
         t = f/FPS
