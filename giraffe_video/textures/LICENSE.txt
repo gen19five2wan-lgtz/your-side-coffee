@@ -1,0 +1,2 @@
+Textures from Poly Haven (https://polyhaven.com), CC0 1.0 (public domain):
+painted_metal_shutter, rubber_tiles, worn_shutter, concrete_wall_004
