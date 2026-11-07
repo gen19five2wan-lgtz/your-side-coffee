@@ -1,3 +1,5 @@
-audio.wav
-audio_giraffe.wav
+frames3d/
+web3d/node_modules/
+render3d.log
+audio_*.wav
 __pycache__/
