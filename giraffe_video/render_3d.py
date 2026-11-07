@@ -2,7 +2,7 @@
 使い方:
   python3 render_giraffe.py preview     確認用の静止画 (pv_3_*.png)
   python3 render_giraffe.py check       文字色のコントラスト比を表示
-  python3 render_giraffe.py             本番書き出し -> dosoku_kaiten_3d_station.mp4
+  python3 render_giraffe.py             本番書き出し -> dosoku_kaiten_3d_full.mp4
 素材:
   giraffe.png            真上から見た透過PNG(頭が右向き・ほぼ一直線)。無ければ仮キリンを自動生成
   giraffe_meta.json      任意。{"tail_x":..,"nose_x":..,"axis_y":..,"rotate":deg} 尾の付け根/鼻先/体軸のpx座標
@@ -425,7 +425,7 @@ def title(t):
 # ---------- 3D(three.js)で描いた画に、HUD・文字を重ねる ----------
 CUR = {"key": None}
 FRAMES3D = os.path.join(HERE, "frames3d")
-SCENES3D = ("setup", "realtime", "slowmo", "why")
+SCENES3D = ("setup", "realtime", "slowmo", "why", "demo")
 def base3d():
     key = CUR["key"]
     im = Image.open(os.path.join(FRAMES3D, key + ".jpg")).convert("RGB").resize((CW, CH), Image.LANCZOS)
@@ -558,6 +558,46 @@ def result(t):
     text(dr, (W/2, 880), f"約{T_FALL:.1f}秒・約{math.degrees(TH_FALL):.0f}°回って落下", 44, fill=INK, alpha=c)
     return im
 
+
+disc_th = np.load(os.path.join(HERE, "disc_traj.npy"))
+
+@scene(3.5)
+def demo_card(t):
+    im, dr = canvas()
+    a, b, c = ease(t/0.5), ease((t-0.9)/0.5), ease((t-1.8)/0.5)
+    text(dr, (W/2, 330), "実現例", 44, fill=SHU, alpha=a)
+    text(dr, (W/2, 470), "寝転ぶ体を", 58, fill=INK, alpha=a)
+    text(dr, (W/2, 560), "丸い台にのせたら…", 58, fill=INK, alpha=b)
+    if t > 1.8:
+        marker_band(dr, W/2, 740, 640, 100, seed=7)
+        text(dr, (W/2, 740), "ずっと回れる！", int(76 + 30*(1-c)), fill=SHU)
+    return im
+
+@scene(12.0)
+def demo(t):
+    im, dr, _ = base3d()
+    i = min(int(round(t/1e-3)), len(disc_th)-1); ang = math.degrees(disc_th[i])
+    board(dr, 14, 10, W-14, 112, seed=151)
+    text(dr, (W/2, 60), "実現例：丸い台", 44, fill=LIGHT)
+    board(dr, 24, 1092, 356, 1262, seed=152)
+    board(dr, 364, 1092, 696, 1262, seed=153)
+    text(dr, (190, 1150), "経過時間", 30, fill=LIGHT2, black=False)
+    text(dr, (190, 1215), f"{t:4.2f} 秒", 62, fill=LIGHT)
+    text(dr, (530, 1150), "回転した角度", 30, fill=LIGHT2, black=False)
+    text(dr, (530, 1215), f"{ang:5.1f}°", 62, fill=YAMA)
+    cap = None
+    if 0.5 < t < 4.0: cap = "丸い台は どの角度でも手すりにのる"
+    elif 4.0 < t < 8.5: cap = "左右で逆向き → 回り続ける"
+    elif t > 8.5: cap = "落ちない！ ずっとくるくる回れる"
+    if cap:
+        board(dr, 14, 126, W-14, 202, fill=PAPER, outline=INK, r=22, seed=161)
+        text(dr, (W/2, 164), cap, 36, fill=INK)
+    if t > 9.5:
+        k = ease((t-9.5)/0.3)
+        board(dr, W/2-250, 520, W/2+250, 680, fill=BLUE_OK, outline=INK, r=30, seed=171)
+        text(dr, (W/2, 600), "ずっと回れた！", int(70+30*(1-k)), fill=(255, 255, 255))
+    return im
+
 @scene(3.5)
 def caution(t):
     im, dr = canvas()
@@ -576,7 +616,7 @@ def kenburns(im, u, dx, dy):
 def _wrap(fn, dur, dx, dy):
     def w(t): return kenburns(fn(t), t/dur, dx, dy)
     w.__name__ = fn.__name__; return w
-_kb = {"title": (1, 1), "countdown": (-1, 1), "slowcard": (1, -1), "result": (-1, -1), "caution": (1, 1)}
+_kb = {"demo_card": (1, -1), "title": (1, 1), "countdown": (-1, 1), "slowcard": (1, -1), "result": (-1, -1), "caution": (1, 1)}
 for _i, (_dur, _fn) in enumerate(scenes):
     if _fn.__name__ in _kb: scenes[_i] = (_dur, _wrap(_fn, _dur, *_kb[_fn.__name__]))
 
@@ -641,6 +681,7 @@ def build_sfx():
     thud(S["slowmo"]+T_FALL*SLOW)
     tone(S["result"]+1.0, 1046, 0.7, 0.35, 4); tone(S["result"]+1.08, 1318, 0.7, 0.3, 4)
     tone(S["result"]+2.0, 220, 0.6, 0.45, 5); tone(S["result"]+2.0, 233, 0.6, 0.4, 5)
+    tone(S["demo"]+9.5, 1046, 0.7, 0.35, 4); tone(S["demo"]+9.58, 1318, 0.7, 0.3, 4); tone(S["demo"]+9.66, 1568, 0.9, 0.3, 3)
     return np.clip(audio, -1, 1)
 
 def load_voice(path, tempo=1.0):
@@ -717,15 +758,15 @@ if __name__ == "__main__":
         if n in SCENES3D: items.append({"key": f"f{f:05d}", "scene": n, "t": float(t - starts[idx]), "T": float(t)})
     run_node(items, workers=4)
     audio, has_voice = build_audio()
-    with wave.open(os.path.join(HERE, "audio_3d_station.wav"), "wb") as wf:
+    with wave.open(os.path.join(HERE, "audio_3d_full.wav"), "wb") as wf:
         wf.setnchannels(1); wf.setsampwidth(2); wf.setframerate(SR)
         wf.writeframes((audio*32000).astype(np.int16).tobytes())
     af = ["-af", "loudnorm=I=-14:TP=-1.5:LRA=11"] if has_voice else []
     p = subprocess.Popen(["ffmpeg", "-y", "-v", "error", "-f", "rawvideo", "-pix_fmt", "rgb24",
-                          "-s", f"{W}x{H}", "-r", str(FPS), "-i", "-", "-i", os.path.join(HERE, "audio_3d_station.wav"),
+                          "-s", f"{W}x{H}", "-r", str(FPS), "-i", "-", "-i", os.path.join(HERE, "audio_3d_full.wav"),
                           "-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-pix_fmt", "yuv420p",
                           *af, "-c:a", "aac", "-b:a", "128k", "-shortest", "-movflags", "+faststart",
-                          os.path.join(HERE, "dosoku_kaiten_3d_station.mp4")], stdin=subprocess.PIPE)
+                          os.path.join(HERE, "dosoku_kaiten_3d_full.mp4")], stdin=subprocess.PIPE)
     idx = 0
     for f in range(nfr):
         t = f/FPS

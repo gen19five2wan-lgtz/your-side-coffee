@@ -5,7 +5,7 @@ const RAIL_HW = 14 / PPM;
 const RAIL_TOP = 0.95, BODY_Y = RAIL_TOP + 0.11;   // 手すりの高さ: 床から約95cm
 const PANEL_IN = 0.28, BELT_IN = 0.40, BELT_W = 1.0, TUN_R = 3.3, TUN_Y0 = 0.9;
 const W = 720, H = 1280;
-let TRAJ, TF, renderer, scene3, camera, G = {};
+let TRAJ, DISC, TF, renderer, scene3, camera, G = {};
 const ease = x => { x = Math.min(Math.max(x, 0), 1); return x * x * (3 - 2 * x); };
 const state = ts => TRAJ[Math.min(Math.round(ts / 1e-4), TRAJ.length - 1)];
 const mod = (a, n) => ((a % n) + n) % n;
@@ -108,6 +108,42 @@ function buildGiraffe() {
   return grp;
 }
 
+function buildPerson(seed, outerSign) {
+  let sd = seed; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647, pick = a => a[Math.floor(rnd() * a.length)];
+  const skin = pick([0xf1c9a5, 0xdfae88, 0xc08a62, 0x8d5a3c]), shirt = pick([0x2f4a7a, 0x7a2f2f, 0x2e6a4f, 0xcfc7b8, 0x3a3a42, 0xb8762e, 0x5a3e7a, 0x20242c]);
+  const pants = pick([0x22252e, 0x3a3f52, 0x5a4a3a, 0x2a2a2a, 0x46506a]), hair = pick([0x1a1410, 0x3b2a1c, 0x6b5a40, 0x9a9a9a, 0x0e0e0e]);
+  const mat = (c, r = 0.85) => new THREE.MeshStandardMaterial({ color: c, roughness: r });
+  const M = { skin: mat(skin, 0.7), shirt: mat(shirt), pants: mat(pants), hair: mat(hair, 0.9), shoe: mat(0x15151a, 0.5) };
+  const g = new THREE.Group();
+  const part = (geo, m) => { const o = new THREE.Mesh(geo, m); o.castShadow = o.receiveShadow = true; return o; };
+  const cap = (r, len, m, sz = 1) => { const o = part(new THREE.CapsuleGeometry(r, len, 6, 12), m); o.scale.z = sz; return o; };
+  const limb = (x, y, upper, lower, r1, r2, m, mEnd, endGeo) => {          // 肩/股関節 → 上腕/太もも → ひじ/ひざ → 前腕/すね
+    const j = new THREE.Group(); j.position.set(x, y, 0);
+    const u = cap(r1, upper - 2 * r1, m); u.position.y = -upper / 2; j.add(u);
+    const k = new THREE.Group(); k.position.y = -upper; j.add(k);
+    const l = cap(r2, lower - 2 * r2, m); l.position.y = -lower / 2; k.add(l);
+    if (endGeo) { const e = part(endGeo, mEnd); e.position.y = -lower - (endGeo.type === 'BoxGeometry' ? 0.02 : 0); e.position.z = endGeo.type === 'BoxGeometry' ? 0.06 : 0; k.add(e); }
+    j.userData.knee = k; return j;
+  };
+  const legL = limb(-0.09, 0.93, 0.43, 0.45, 0.075, 0.055, M.pants, M.shoe, new THREE.BoxGeometry(0.1, 0.07, 0.27));
+  const legR = limb(0.09, 0.93, 0.43, 0.45, 0.075, 0.055, M.pants, M.shoe, new THREE.BoxGeometry(0.1, 0.07, 0.27));
+  g.add(legL, legR);
+  const torso = cap(0.15, 0.30, M.shirt, 0.62); torso.position.y = 1.22; g.add(torso);                      // 胴(前後に薄い)
+  const hip = part(new THREE.SphereGeometry(0.15, 16, 12), M.pants); hip.scale.set(1, 0.6, 0.62); hip.position.y = 0.97; g.add(hip);
+  const neck = part(new THREE.CylinderGeometry(0.045, 0.05, 0.1, 10), M.skin); neck.position.y = 1.52; g.add(neck);
+  const head = part(new THREE.SphereGeometry(0.105, 24, 18), M.skin); head.scale.set(0.92, 1.1, 1.0); head.position.y = 1.64; g.add(head);
+  const hairM = part(new THREE.SphereGeometry(0.112, 24, 18, 0, Math.PI * 2, 0, Math.PI * 0.58), M.hair); hairM.scale.set(0.95, 1.1, 1.05); hairM.position.set(0, 1.655, -0.01); g.add(hairM);
+  const armO = limb(outerSign * 0.2, 1.42, 0.28, 0.26, 0.05, 0.042, M.shirt, M.skin, new THREE.SphereGeometry(0.045, 10, 8));
+  const armI = limb(-outerSign * 0.2, 1.42, 0.28, 0.26, 0.05, 0.042, M.shirt, M.skin, new THREE.SphereGeometry(0.045, 10, 8));
+  armO.rotation.z = -outerSign * 0.62; armO.userData.knee.rotation.x = -0.35; armO.rotation.x = -0.25;               // 外側の手すりに手をのせる
+  armI.rotation.z = outerSign * 0.06; armI.userData.knee.rotation.x = -0.5; armI.rotation.x = -0.1;
+  g.add(armO, armI);
+  if (rnd() < 0.5) { const bp = part(new THREE.BoxGeometry(0.3, 0.4, 0.16), mat(pick([0x2a2a30, 0x3a4a3a, 0x7a3a2a]), 0.9)); bp.position.set(0, 1.25, -0.17); g.add(bp); }   // リュック
+  legL.userData.knee.rotation.x = 0.05; legR.userData.knee.rotation.x = 0.02;
+  g.userData.sway = rnd() * 6.28; g.userData.head = head; g.userData.hair = hairM;
+  return g;
+}
+
 async function init(aa = true) {
   renderer = new THREE.WebGLRenderer({ antialias: aa, preserveDrawingBuffer: true });
   renderer.setPixelRatio(1.5); renderer.setSize(W, H);
@@ -115,7 +151,7 @@ async function init(aa = true) {
   renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
   renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   document.body.appendChild(renderer.domElement);
-  TRAJ = await (await fetch('/web3d/traj.json')).json(); TF = TRAJ[TRAJ.length - 1][0];
+  DISC = await (await fetch('/web3d/disc_traj.json')).json(); TRAJ = await (await fetch('/web3d/traj.json')).json(); TF = TRAJ[TRAJ.length - 1][0];
   scene3 = new THREE.Scene(); scene3.background = new THREE.Color(0x05060b);
   camera = new THREE.PerspectiveCamera(72, W / H, 0.05, 120);
   scene3.add(new THREE.HemisphereLight(0xb8c4e0, 0x6a5e52, 1.15));
@@ -179,11 +215,23 @@ async function init(aa = true) {
   cubeCam.position.set(0, 2.2, 0); scene3.add(cubeCam); cubeCam.update(renderer, scene3);
   const pm = new THREE.PMREMGenerator(renderer); scene3.environment = pm.fromCubemap(cubeRT.texture).texture; scene3.environmentIntensity = 0.9;
 
+  // 丸い台(実現例)
+  G.disc = new THREE.Group();
+  const dm = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.6, 0.04, 72), new THREE.MeshStandardMaterial({ color: 0x2f6fb0, roughness: 0.55 })); dm.castShadow = dm.receiveShadow = true;
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(0.5, 0.012, 8, 72), new THREE.MeshStandardMaterial({ color: 0xf2e6c2, roughness: 0.6 })); ring.rotation.x = Math.PI / 2; ring.position.y = 0.022;
+  G.disc.add(dm, ring); G.disc.visible = false; scene3.add(G.disc);
+  // ベルトに乗る人たち(左は手前へ、右は奥へ。手すりに手をのせて立つ)
+  G.people = [];
+  const LOOP = 18;
+  for (const sgn of [-1, 1]) for (let k = 0; k < 7; k++) {
+    const p = buildPerson(1000 + (sgn + 2) * 97 + k * 31, -1); p.userData.sgn = sgn; p.userData.z0 = k * (LOOP / 7) + (sgn > 0 ? 1.1 : 0);
+    p.rotation.y = sgn < 0 ? 0 : Math.PI; scene3.add(p); G.people.push(p);
+  }
   // キリン
   G.giraffe = buildGiraffe(); scene3.add(G.giraffe);
   // 残像・矢印・十字・寸法線・why の棒
-  G.trails = []; const trMat = new THREE.MeshBasicMaterial({ color: 0x8ca5dc });
-  for (let i = 0; i < 12; i++) { const m = new THREE.Mesh(new THREE.BoxGeometry(LEN, 0.004, 0.016), trMat); m.position.y = (RAIL_TOP + 0.008); m.visible = false; scene3.add(m); G.trails.push(m); }
+  G.trails = [];
+  for (let i = 0; i < 12; i++) { const m = new THREE.Mesh(new THREE.BoxGeometry(LEN, 0.004, 0.016), new THREE.MeshBasicMaterial({ color: 0x8ca5dc, transparent: true, opacity: 1 })); m.position.y = (RAIL_TOP + 0.008); m.visible = false; scene3.add(m); G.trails.push(m); }
   G.farr = [0, 1].map(() => {
     const g = new THREE.Group(), mat = new THREE.MeshBasicMaterial({ color: 0xe63228, depthTest: false });
     const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 1, 12), mat), head = new THREE.Mesh(new THREE.ConeGeometry(0.048, 0.079, 16), mat), dot = new THREE.Mesh(new THREE.SphereGeometry(0.027, 16, 12), mat);
@@ -219,11 +267,22 @@ function renderFrame(scene, t, T) {
   if (scene === 'slowmo') { ts = t < TF * slow ? t / slow : TF + (t - TF * slow); trails = forces = center = true; }
   if (scene === 'why') { ts = 0; showG = false; }
   if (scene === 'setup') { showG = t > 0.8; ts = t; }
+  const demo = scene === 'demo'; if (demo) { ts = t; showG = true; center = true; }
   const fell = (scene === 'realtime' || scene === 'slowmo') && ts >= TF, st = state(Math.min(ts, TF));
   G.floorTex[0].offset.y = V * ts / 1.0; G.floorTex[1].offset.y = -V * ts / 1.0;           // 左は+Z(手前)へ、右は-Z(奥)へ
   G.railTex[0].offset.y = -V * ts / 0.35; G.railTex[1].offset.y = V * ts / 0.35;
+  for (const p of G.people) {                                                // ベルトと一緒に動く利用者
+    const sg = p.userData.sgn, LOOP = 18;
+    p.position.set(sg * 1.19, 0, -9 + mod(p.userData.z0 + 9 - sg * V * ts, LOOP));
+    const sw = Math.sin(p.userData.sway + T * 0.9); p.rotation.z = 0.015 * sw; p.userData.head.rotation.y = 0.25 * Math.sin(p.userData.sway * 2 + T * 0.35); p.userData.hair.rotation.y = p.userData.head.rotation.y;
+  }
+  G.disc.visible = demo;
   const gp = G.giraffe; gp.visible = showG;
-  if (showG) {
+  if (demo) {
+    const th = DISC[Math.min(Math.round(t / 1e-3), DISC.length - 1)];
+    G.disc.position.set(0, RAIL_TOP + 0.02, 0); G.disc.rotation.y = th;
+    gp.position.set(0, RAIL_TOP + 0.04 + 0.11, 0); gp.rotation.y = th;
+  } else if (showG) {
     let th = st[3], dropY = 0;
     if (scene === 'setup') th = 0;
     if (fell) { const k = ease((ts - TF) / 0.35); th += 0.15 * k; dropY = 0.36 * k; }
@@ -231,8 +290,12 @@ function renderFrame(scene, t, T) {
   }
   G.cross.visible = center && !fell && false;
   G.cross.visible = center;
-  if (center) { G.cross.position.set(st[1], RAIL_TOP + 0.23, -st[2]); }
-  let i = 0; for (const m of G.trails) m.visible = false;
+  if (center) { G.cross.position.set(demo ? 0 : st[1], RAIL_TOP + (demo ? 0.36 : 0.23), demo ? 0 : -st[2]); }
+  let i = 0; for (const m of G.trails) { m.visible = false; m.material.opacity = 1; }
+  if (demo) for (let j = 1; j <= 8; j++) {                                   // 残像: 0.12秒ごと、古いほど薄く
+    const tt = t - j * 0.12; if (tt < 0) break; const m = G.trails[j - 1], a = DISC[Math.round(tt / 1e-3)];
+    m.visible = true; m.position.set(0, RAIL_TOP + 0.075, 0); m.rotation.y = a; m.material.opacity = 0.7 * (1 - (j - 1) / 8);
+  }
   if (trails) for (let k = 0.15; k < Math.min(ts, TF) && i < 12; k += 0.15, i++) {
     const s2 = state(k), m = G.trails[i]; m.visible = true; m.position.set(s2[1], (RAIL_TOP + 0.008), -s2[2]); m.rotation.y = s2[3];
   }
@@ -251,7 +314,7 @@ function renderFrame(scene, t, T) {
   G.bars.forEach((b, i) => { const a = ease((t - 0.4 - i * 1.4) / 0.5); b.visible = scene === 'why' && a > 0; b.scale.set(Math.max(a, 0.001), 1, 1); });
   let cz = 0; if (scene === 'why') cz = 30 / PPM;
   if (scene === 'dbg') { camera.position.set(t - 10, T, 6); camera.up.set(0, 1, 0); camera.lookAt(0, T * 0.6, -8); camera.updateMatrixWorld(); renderer.render(scene3, camera); return { label: [0, 0] }; }
-  cameraRig(T, 0, cz, scene === 'setup' ? 0 : (scene === 'why' ? 0 : st[3]), scene === 'why' ? 2.4 : null);
+  cameraRig(T, 0, cz, scene === 'setup' ? 0 : (scene === 'why' ? 0 : st[3]), scene === 'why' ? 2.4 : (demo ? 3.1 : null));
   renderer.render(scene3, camera);
   const lp = new THREE.Vector3(0, RAIL_TOP + 0.012, 210 / PPM + 52 / PPM * 1.15).project(camera);
   return { label: [(lp.x * 0.5 + 0.5) * W, (-lp.y * 0.5 + 0.5) * H] };
