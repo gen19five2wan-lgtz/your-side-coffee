@@ -15,7 +15,7 @@ const srv = http.createServer((q, r) => { const p = path.join(root, decodeURICom
   for (const it of items) {
     const f = path.join(out, it.key + '.jpg'); const mf = path.join(out, it.key + '.json');
     if (fs.existsSync(f) && fs.existsSync(mf)) continue;
-    const r = await pg.evaluate(([s, t, T]) => { const o = window.renderFrame(s, t, T); return [o, window.grab()]; }, [it.scene, it.t, it.T]);
+    const r = await pg.evaluate(([s, t, T, k]) => { const o = window.renderFrame(s, t, T, k); return [o, window.grab()]; }, [it.scene, it.t, it.T, it.k || 1]);
     fs.writeFileSync(f, Buffer.from(r[1].split(',')[1], 'base64')); fs.writeFileSync(mf, JSON.stringify(r[0]));
     if (++n % 20 === 0) console.log(n, '/', items.length, ((Date.now() - t0) / n / 1000).toFixed(2), 's/frame');
   }

@@ -252,21 +252,25 @@ async function init(aa = true) {
   return true;
 }
 
-function cameraRig(T, cx, cz, th = 0, base = null) {
-  const yaw = 0.32 * Math.sin(2 * Math.PI * T / 17.0), pitch = 0.24 + 0.15 * Math.sin(2 * Math.PI * T / 11.0 + 1.0);
-  const need = base ?? (3.05 - 1.2 * Math.abs(Math.sin(th))), dist = need + 0.25 * Math.sin(2 * Math.PI * T / 13.0);
-  const tx = cx + 0.12 * Math.sin(2 * Math.PI * T / 9.0), tz = cz + 0.22 * Math.sin(2 * Math.PI * T / 7.0 + 0.5);
-  const sh = 0.004 * Math.sin(T * 9.1) + 0.003 * Math.sin(T * 17.3);                      // ドローンのわずかな揺れ
-  camera.position.set(tx + dist * Math.sin(pitch) * Math.sin(yaw) + sh, RAIL_TOP + dist * Math.cos(pitch), tz + dist * Math.sin(pitch) * Math.cos(yaw) + sh);
+function cameraRig(Tc, cx, cz, base) {
+  // ドローンがキリンを中心に、ゆっくり回り込みながら舐めるように動き続ける。
+  // 周期の長い正弦だけを重ねる(速い成分・手ぶれは入れない)ので、速度も加速度も連続で滑らか。Tc は3Dシーンだけをつないだ連続時計。
+  const w = 2 * Math.PI;
+  const yaw = 0.78 * Math.sin(w * Tc / 22.0) + 0.14 * Math.sin(w * Tc / 8.3 + 1.0);
+  const pitch = 0.32 + 0.11 * Math.sin(w * Tc / 13.0 + 0.6);                // 真上から約18°±6°
+  const dist = base + 0.12 * Math.sin(w * Tc / 10.0);
+  const tx = cx + 0.08 * Math.sin(w * Tc / 12.0), tz = cz + 0.12 * Math.sin(w * Tc / 9.0 + 0.5);
+  camera.position.set(tx + dist * Math.sin(pitch) * Math.sin(yaw), RAIL_TOP + dist * Math.cos(pitch), tz + dist * Math.sin(pitch) * Math.cos(yaw));
   camera.up.set(0, 1, 0); camera.lookAt(tx, RAIL_TOP, tz); camera.updateMatrixWorld();
 }
 
-function renderFrame(scene, t, T) {
+function renderFrame(scene, t, T, k = 1) {
+  const tu = t * k;
   const slow = 8.0;
   let ts = t, trails = false, forces = false, center = false, showG = true;
   if (scene === 'slowmo') { ts = t < TF * slow ? t / slow : TF + (t - TF * slow); trails = forces = center = true; }
   if (scene === 'why') { ts = 0; showG = false; }
-  if (scene === 'setup') { showG = t > 0.8; ts = t; }
+  if (scene === 'setup') { showG = tu > 0.8; ts = t; }
   const demo = scene === 'demo'; if (demo) { ts = t; showG = true; center = true; }
   const fell = (scene === 'realtime' || scene === 'slowmo') && ts >= TF, st = state(Math.min(ts, TF));
   G.floorTex[0].offset.y = V * ts / 1.0; G.floorTex[1].offset.y = -V * ts / 1.0;           // 左は+Z(手前)へ、右は-Z(奥)へ
@@ -311,10 +315,10 @@ function renderFrame(scene, t, T) {
     head.position.copy(dir.clone().multiplyScalar(len - 0.0395)); head.quaternion.copy(q);
   });
   G.dim.visible = scene === 'setup';
-  G.bars.forEach((b, i) => { const a = ease((t - 0.4 - i * 1.4) / 0.5); b.visible = scene === 'why' && a > 0; b.scale.set(Math.max(a, 0.001), 1, 1); });
+  G.bars.forEach((b, i) => { const a = ease((tu - 0.4 - i * 1.4) / 0.5); b.visible = scene === 'why' && a > 0; b.scale.set(Math.max(a, 0.001), 1, 1); });
   let cz = 0; if (scene === 'why') cz = 30 / PPM;
   if (scene === 'dbg') { camera.position.set(t - 10, T, 6); camera.up.set(0, 1, 0); camera.lookAt(0, T * 0.6, -8); camera.updateMatrixWorld(); renderer.render(scene3, camera); return { label: [0, 0] }; }
-  cameraRig(T, 0, cz, scene === 'setup' ? 0 : (scene === 'why' ? 0 : st[3]), scene === 'why' ? 2.4 : (demo ? 3.1 : null));
+  cameraRig(T, 0, cz, scene === 'why' ? 2.5 : (demo ? 3.0 : (scene === 'setup' ? 3.05 : 2.95)));
   renderer.render(scene3, camera);
   const lp = new THREE.Vector3(0, RAIL_TOP + 0.012, 210 / PPM + 52 / PPM * 1.15).project(camera);
   return { label: [(lp.x * 0.5 + 0.5) * W, (-lp.y * 0.5 + 0.5) * H] };

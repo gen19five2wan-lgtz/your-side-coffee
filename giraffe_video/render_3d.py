@@ -2,7 +2,7 @@
 使い方:
   python3 render_giraffe.py preview     確認用の静止画 (pv_3_*.png)
   python3 render_giraffe.py check       文字色のコントラスト比を表示
-  python3 render_giraffe.py             本番書き出し -> dosoku_kaiten_3d_full.mp4
+  python3 render_giraffe.py             本番書き出し -> dosoku_kaiten_3d_40s.mp4
 素材:
   giraffe.png            真上から見た透過PNG(頭が右向き・ほぼ一直線)。無ければ仮キリンを自動生成
   giraffe_meta.json      任意。{"tail_x":..,"nose_x":..,"axis_y":..,"rotate":deg} 尾の付け根/鼻先/体軸のpx座標
@@ -426,6 +426,7 @@ def title(t):
 CUR = {"key": None}
 FRAMES3D = os.path.join(HERE, "frames3d")
 SCENES3D = ("setup", "realtime", "slowmo", "why", "demo")
+KU = {"setup": 1.75, "why": 1.75}
 def base3d():
     key = CUR["key"]
     im = Image.open(os.path.join(FRAMES3D, key + ".jpg")).convert("RGB").resize((CW, CH), Image.LANCZOS)
@@ -461,8 +462,9 @@ def run_node(items, workers=4):
         procs.append(subprocess.Popen(["node", os.path.join(HERE, "web3d", "render_frames.js"), jf, FRAMES3D], cwd=os.path.join(HERE, "web3d")))
     for p in procs: p.wait()
 
-@scene(7.0)
+@scene(4.0)
 def setup(t):
+    tu = t*1.75
     im, dr, meta = base3d()
     lx, ly = meta["label"]
     board(dr, lx-80, ly-28, lx+80, ly+28, fill=PAPER, outline=INK, r=16, seed=62)
@@ -472,7 +474,7 @@ def setup(t):
     board(dr, 14, 1092, W-14, 1266, seed=64)
     rows = ["手すりの速さ：分速40m（逆向き）", "身長170cm・体はまっすぐな棒として計算", "手すりの摩擦係数：0.6"]
     for i, r in enumerate(rows):
-        al = ease((t-1.5-i*0.9)/0.5)
+        al = ease((tu-1.5-i*0.9)/0.5)
         text(dr, (W/2, 1125+i*58), r, 34, fill=LIGHT, black=False, alpha=al)
     return im
 
@@ -489,7 +491,7 @@ def countdown(t):
         text(dr, (W/2, H/2), "スタート", 120, fill=SHU)
     return im
 
-REAL_HOLD = 3.0
+REAL_HOLD = 1.5
 @scene(T_FALL + REAL_HOLD)
 def realtime(t):
     im, dr, _ = base3d()
@@ -498,7 +500,7 @@ def realtime(t):
         k = ease((t-T_FALL)/0.25)
         board(dr, W/2-230, 520, W/2+230, 680, fill=SHU, outline=INK, r=30, seed=71)
         text(dr, (W/2, 600), "落下！", int(80+40*(1-k)), fill=(255, 255, 255))
-    if t > T_FALL + 1.2:
+    if t > T_FALL + 0.9:
         text(dr, (W/2, 940), "一瞬で落ちた…", 52, fill=INK, stroke=5, stroke_fill=PAPER)
     return im
 
@@ -511,7 +513,7 @@ def slowcard(t):
     return im
 
 SLOW = 8.0
-@scene(T_FALL*SLOW + 4.0)
+@scene(T_FALL*SLOW + 1.4)
 def slowmo(t):
     im, dr, _ = base3d()
     ts = t/SLOW if t < T_FALL*SLOW else T_FALL + (t - T_FALL*SLOW)
@@ -526,8 +528,9 @@ def slowmo(t):
         text(dr, (W/2, 164), cap, 36, fill=INK)
     return im
 
-@scene(7.0)
+@scene(4.0)
 def why(t):
+    t = t*1.75
     im, dr, _ = base3d()
     board(dr, 14, 10, W-14, 112, seed=91)
     text(dr, (W/2, 60), "なぜ一生は回れないのか", 46, fill=LIGHT)
@@ -573,10 +576,10 @@ def demo_card(t):
         text(dr, (W/2, 740), "ずっと回れる！", int(76 + 30*(1-c)), fill=SHU)
     return im
 
-@scene(12.0)
+@scene(7.0)
 def demo(t):
     im, dr, _ = base3d()
-    i = min(int(round(t/1e-3)), len(disc_th)-1); ang = math.degrees(disc_th[i])
+    i = min(int(round(t/1e-3)), len(disc_th)-1); ang = math.degrees(disc_th[i]); tu = t*12/7
     board(dr, 14, 10, W-14, 112, seed=151)
     text(dr, (W/2, 60), "実現例：丸い台", 44, fill=LIGHT)
     board(dr, 24, 1092, 356, 1262, seed=152)
@@ -586,14 +589,14 @@ def demo(t):
     text(dr, (530, 1150), "回転した角度", 30, fill=LIGHT2, black=False)
     text(dr, (530, 1215), f"{ang:5.1f}°", 62, fill=YAMA)
     cap = None
-    if 0.5 < t < 4.0: cap = "丸い台は どの角度でも手すりにのる"
-    elif 4.0 < t < 8.5: cap = "左右で逆向き → 回り続ける"
-    elif t > 8.5: cap = "落ちない！ ずっとくるくる回れる"
+    if 0.5 < tu < 4.0: cap = "丸い台は どの角度でも手すりにのる"
+    elif 4.0 < tu < 8.5: cap = "左右で逆向き → 回り続ける"
+    elif tu > 8.5: cap = "落ちない！ ずっとくるくる回れる"
     if cap:
         board(dr, 14, 126, W-14, 202, fill=PAPER, outline=INK, r=22, seed=161)
         text(dr, (W/2, 164), cap, 36, fill=INK)
-    if t > 9.5:
-        k = ease((t-9.5)/0.3)
+    if tu > 9.5:
+        k = ease((tu-9.5)/0.3)
         board(dr, W/2-250, 520, W/2+250, 680, fill=BLUE_OK, outline=INK, r=30, seed=171)
         text(dr, (W/2, 600), "ずっと回れた！", int(70+30*(1-k)), fill=(255, 255, 255))
     return im
@@ -613,12 +616,18 @@ def kenburns(im, u, dx, dy):
     w, h = CW/sc, CH/sc
     x0 = (CW-w)*(0.5 + 0.4*dx*(u-0.5)); y0 = (CH-h)*(0.5 + 0.4*dy*(0.5-u))
     return im.crop((int(x0), int(y0), int(x0+w), int(y0+h))).resize((CW, CH), Image.BICUBIC)
-def _wrap(fn, dur, dx, dy):
-    def w(t): return kenburns(fn(t), t/dur, dx, dy)
+NEWDUR = {"title": 2.5, "countdown": 1.6, "slowcard": 1.3, "result": 3.2, "demo_card": 1.5, "caution": 1.5}
+def _wrap(fn, dur, dx, dy, nd):
+    def w(t): return kenburns(fn(t*dur/nd), t/nd, dx, dy)
     w.__name__ = fn.__name__; return w
 _kb = {"demo_card": (1, -1), "title": (1, 1), "countdown": (-1, 1), "slowcard": (1, -1), "result": (-1, -1), "caution": (1, 1)}
 for _i, (_dur, _fn) in enumerate(scenes):
-    if _fn.__name__ in _kb: scenes[_i] = (_dur, _wrap(_fn, _dur, *_kb[_fn.__name__]))
+    if _fn.__name__ in _kb: scenes[_i] = (NEWDUR[_fn.__name__], _wrap(_fn, _dur, *_kb[_fn.__name__], NEWDUR[_fn.__name__]))
+
+# カメラの時計: 3Dシーンの時間だけを足して連続させる(場面の頭で動きがリセットされない)
+CAMOFF, _acc = {}, 0.0
+for _d, _f in scenes:
+    if _f.__name__ in SCENES3D: CAMOFF[_f.__name__] = _acc; _acc += _d
 
 # ---------- コントラスト確認 ----------
 def _lum(c):
@@ -672,16 +681,16 @@ def build_sfx():
     def ticks(t0, t1, period, f=2200, amp=0.12):
         t = t0
         while t < t1: tone(t, f, 0.03, amp, 120); t += period
-    tone(S["title"]+1.9, 660, 0.6, 0.3, 4); tone(S["title"]+2.0, 990, 0.8, 0.25, 3)
-    for k in range(3): tone(S["countdown"]+k, 880, 0.25, 0.4, 10)
-    tone(S["countdown"]+3, 1760, 0.6, 0.45, 5)
+    tone(S["title"]+0.95, 660, 0.6, 0.3, 4); tone(S["title"]+1.0, 990, 0.8, 0.25, 3)
+    for k in range(3): tone(S["countdown"]+0.4*k, 880, 0.2, 0.4, 14)
+    tone(S["countdown"]+1.2, 1760, 0.4, 0.45, 6)
     ticks(S["realtime"], S["realtime"]+T_FALL, 0.1)
     thud(S["realtime"]+T_FALL)
     ticks(S["slowmo"], S["slowmo"]+T_FALL*SLOW, 0.1*SLOW/2, f=1500)
     thud(S["slowmo"]+T_FALL*SLOW)
-    tone(S["result"]+1.0, 1046, 0.7, 0.35, 4); tone(S["result"]+1.08, 1318, 0.7, 0.3, 4)
-    tone(S["result"]+2.0, 220, 0.6, 0.45, 5); tone(S["result"]+2.0, 233, 0.6, 0.4, 5)
-    tone(S["demo"]+9.5, 1046, 0.7, 0.35, 4); tone(S["demo"]+9.58, 1318, 0.7, 0.3, 4); tone(S["demo"]+9.66, 1568, 0.9, 0.3, 3)
+    tone(S["result"]+0.53, 1046, 0.7, 0.35, 4); tone(S["result"]+0.61, 1318, 0.7, 0.3, 4)
+    tone(S["result"]+1.07, 220, 0.6, 0.45, 5); tone(S["result"]+1.07, 233, 0.6, 0.4, 5)
+    tone(S["demo"]+5.54, 1046, 0.7, 0.35, 4); tone(S["demo"]+5.62, 1318, 0.7, 0.3, 4); tone(S["demo"]+5.7, 1568, 0.9, 0.3, 3)
     return np.clip(audio, -1, 1)
 
 def load_voice(path, tempo=1.0):
@@ -743,7 +752,7 @@ if __name__ == "__main__":
         shots = [("title", 3.5), ("setup", 6), ("countdown", 1.5), ("realtime", 0.6), ("realtime", 3.5),
                  ("slowcard", 2.0), ("slowmo", 0.75*SLOW), ("slowmo", T_FALL*SLOW-0.05), ("slowmo", 11.5),
                  ("why", 6.5), ("result", 5), ("caution", 2)]
-        items = [{"key": f"pv_{n}_{tl:.2f}", "scene": n, "t": tl, "T": float(S[n] + tl)} for n, tl in shots if n in SCENES3D]
+        items = [{"key": f"pv_{n}_{tl:.2f}", "scene": n, "t": tl, "T": float(CAMOFF[n] + tl), "k": KU.get(n, 1)} for n, tl in shots if n in SCENES3D]
         run_node(items, workers=2)
         for name, tl in shots:
             CUR["key"] = f"pv_{name}_{tl:.2f}"
@@ -755,18 +764,18 @@ if __name__ == "__main__":
         t = f/FPS
         while idx < len(scenes)-1 and t >= starts[idx+1]: idx += 1
         n = scenes[idx][1].__name__
-        if n in SCENES3D: items.append({"key": f"f{f:05d}", "scene": n, "t": float(t - starts[idx]), "T": float(t)})
+        if n in SCENES3D: items.append({"key": f"f{f:05d}", "scene": n, "t": float(t - starts[idx]), "T": float(CAMOFF[n] + t - starts[idx]), "k": KU.get(n, 1)})
     run_node(items, workers=4)
     audio, has_voice = build_audio()
-    with wave.open(os.path.join(HERE, "audio_3d_full.wav"), "wb") as wf:
+    with wave.open(os.path.join(HERE, "audio_3d_40s.wav"), "wb") as wf:
         wf.setnchannels(1); wf.setsampwidth(2); wf.setframerate(SR)
         wf.writeframes((audio*32000).astype(np.int16).tobytes())
     af = ["-af", "loudnorm=I=-14:TP=-1.5:LRA=11"] if has_voice else []
     p = subprocess.Popen(["ffmpeg", "-y", "-v", "error", "-f", "rawvideo", "-pix_fmt", "rgb24",
-                          "-s", f"{W}x{H}", "-r", str(FPS), "-i", "-", "-i", os.path.join(HERE, "audio_3d_full.wav"),
+                          "-s", f"{W}x{H}", "-r", str(FPS), "-i", "-", "-i", os.path.join(HERE, "audio_3d_40s.wav"),
                           "-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-pix_fmt", "yuv420p",
                           *af, "-c:a", "aac", "-b:a", "128k", "-shortest", "-movflags", "+faststart",
-                          os.path.join(HERE, "dosoku_kaiten_3d_full.mp4")], stdin=subprocess.PIPE)
+                          os.path.join(HERE, "dosoku_kaiten_3d_40s.mp4")], stdin=subprocess.PIPE)
     idx = 0
     for f in range(nfr):
         t = f/FPS
